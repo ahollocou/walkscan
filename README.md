@@ -5,6 +5,11 @@ described in a research paper submitted to an upcomming data-mining conference.
 
 ## Compilation
 
+Be sure to have downloaded the DBSCAN submodule:
+```shell
+git submodule update --init --recursive
+```
+
 ```shell
 cmake .
 make
