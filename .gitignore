@@ -2,9 +2,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
+walkscan
 
 # C extensions
 *.so
+
+# CMake
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+cmake_install.cmake
 
 # Distribution / packaging
 .Python
