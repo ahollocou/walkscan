@@ -1,5 +1,5 @@
-#ifndef DYCOLA_LEXRANK_H
-#define DYCOLA_LEXRANK_H
+#ifndef WALKSCAN_LEXRANK_H
+#define WALKSCAN_LEXRANK_H
 
 #include <vector>
 #include <map>
@@ -7,36 +7,25 @@
 #include <list>
 #include <algorithm>
 #include <stdint.h>
+#include "../include/utils.h"
+#include "../include/scores.h"
 
-int LexRank(std::vector<std::set<unsigned int> >& nodeNeighbors,
-            std::vector <std::set <unsigned int> >& seeds,
-            unsigned int nbSteps,
-            std::vector <std::vector <std::pair<unsigned int, std::vector <double> > > >& lexRankResult,
-            unsigned int maxNodeId);
-bool nodeLexRankCompare(const std::pair<unsigned int, std::vector <double> >& node1,
-                        const std::pair<unsigned int, std::vector <double> >& node2);
-int LexRankMaxF1(std::vector <std::vector <std::pair<unsigned int, std::vector <double> > > >& lexRankResult,
-                  std::vector <std::set<unsigned int> >& groundTruthCommunities,
-                  std::vector <std::set<unsigned int> >& seeds,
-                  std::vector <std::set<unsigned int> >& communities,
-                  std::vector <double>& f1Scores);
-int LexRankThreshold(std::vector <std::vector <std::pair<unsigned int, std::vector <double> > > >& lexRankResult,
-                      std::vector <std::set<unsigned int> >& groundTruthCommunities,
-                      std::vector <std::set<unsigned int> >& seeds,
-                      std::vector <std::set<unsigned int> >& communities,
-                      std::vector <double>& f1Scores,
-                      std::vector <double>& lexRankThreshold);
-int LexRankThresholdFindBest(std::vector <std::vector <std::pair<unsigned int, std::vector <double> > > >& lexRankResult,
-        std::vector <std::set<unsigned int> >& groundTruthCommunities,
-        std::vector <std::set<unsigned int> >& seeds,
-        std::vector <std::set<unsigned int> >& bestCommunities,
-        std::vector <double>& bestF1Scores,
-        unsigned int nbSteps);
-int LexRankMinConductance(std::vector<std::set <unsigned int> >& nodeNeighbors,
-        std::vector <std::vector <std::pair<unsigned int, std::vector <double> > > >& lexRankResult,
-        std::vector <std::set<unsigned int> >& groundTruthCommunities,
-        std::vector <std::set<unsigned int> >& seeds,
-        std::vector <std::set<unsigned int> >& communities,
-        std::vector <double>& f1Scores);
+int LexRank(std::vector< NodeSet >& nodeNeighbors,
+            std::vector< NodeSet >& seedSets,
+            uint32_t nbSteps,
+            std::vector< std::vector< NodeLexRank > >& lexRankResult,
+            uint32_t maxNodeId);
+bool nodeLexRankCompare(const NodeLexRank& node1, const NodeLexRank& node2);
+int LexRankMaxF1(std::vector< std::vector< NodeLexRank > >& lexRankResult,
+                 std::vector< NodeSet >& groundTruthCommunities,
+                 std::vector< NodeSet >& seedSets,
+                 std::vector< NodeSet >& communities,
+                 std::vector< double >& f1Scores);
+int LexRankMinConductance(std::vector< NodeSet >& nodeNeighbors,
+                          std::vector< std::vector< NodeLexRank > >& lexRankResult,
+                          std::vector< NodeSet >& groundTruthCommunities,
+                          std::vector< NodeSet >& seedSets,
+                          std::vector< NodeSet >& communities,
+                          std::vector< double >& f1Scores);
 
 #endif

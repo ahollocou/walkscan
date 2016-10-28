@@ -14,10 +14,10 @@ long unsigned StopClock(long unsigned initTime) {
     return endTime - initTime;
 }
 
-void DisplayProgress(double progress, unsigned int barWidth) {
+void DisplayProgress(double progress, uint32_t barWidth) {
     std::cout << "[";
-    unsigned int pos = barWidth * progress;
-    for (unsigned int i = 0; i < barWidth; ++i) {
+    uint32_t pos = barWidth * progress;
+    for (uint32_t i = 0; i < barWidth; ++i) {
         if (i < pos) std::cout << "=";
         else if (i == pos) std::cout << ">";
         else std::cout << " ";
@@ -26,25 +26,16 @@ void DisplayProgress(double progress, unsigned int barWidth) {
     std::cout.flush();
 }
 
-void PrintPageRank(std::vector <double> pageRank, std::set<unsigned int> support) {
-    for (std::set<unsigned int>::iterator it = support.begin();
-         it != support.end(); ++it) {
-        printf("Node %i -> %f\n", *it, pageRank[*it]);
-    }
-}
-
-int LoadGraph(char * graphFileName,
-              std::vector <std::pair<unsigned int, unsigned int> >& edgeList,
-              unsigned int& maxNodeId) {
+int LoadGraph(char * graphFileName, std::vector< Edge >& edgeList, uint32_t& maxNodeId) {
     // Opening file
     std::ifstream inFile;
-    inFile.open((const char *)graphFileName);
+    inFile.open((const char *) graphFileName);
     if(!inFile) {
         printf( "Error Openning Graph File\n" );
         return 1;
     }
     // Loading edges
-    unsigned int node1, node2;
+    uint32_t node1, node2;
     maxNodeId = 0;
     while( inFile >> node1 ) {
         inFile >> node2;
@@ -60,19 +51,16 @@ int LoadGraph(char * graphFileName,
     return 0;
 }
 
-int BuildNeighborhoods(std::vector <std::pair<unsigned int, unsigned int> >& edgeList,
-                       std::vector<std::set<unsigned int> >& nodeNeighbors) {
-    for (std::vector <std::pair<unsigned int, unsigned int> >::iterator it1 = edgeList.begin();
-         it1 != edgeList.end(); ++it1) {
-        std::pair<unsigned int, unsigned int> edge(*it1);
+int BuildNeighborhoods(std::vector< Edge >& edgeList, std::vector< NodeSet >& nodeNeighbors) {
+    for (std::vector< Edge >::iterator it = edgeList.begin(); it != edgeList.end(); ++it) {
+        Edge edge(*it);
         nodeNeighbors[edge.first].insert(edge.second);
         nodeNeighbors[edge.second].insert(edge.first);
     }
     return 0;
 }
 
-int LoadCommunity(char * communityFileName,
-                  std::vector <std::set<unsigned int> >& communities) {
+int LoadCommunity(char * communityFileName, std::vector< NodeSet >& communities, std::vector< NodeSet >& nodeCommunities) {
     // Opening file
     std::ifstream inFile;
     inFile.open((const char *)communityFileName);
@@ -82,32 +70,31 @@ int LoadCommunity(char * communityFileName,
     }
     // Loading communities
     std::string line;
-    unsigned int nodeId;
+    uint32_t nodeId;
+    uint32_t communityIndex = 0;
     while(std::getline(inFile, line)) {
         std::stringstream linestream(line);
-        std::set<unsigned int> community;
+        NodeSet community;
         while(linestream >> nodeId) {
             community.insert(nodeId);
+            nodeCommunities[nodeId].insert(communityIndex);
         }
         communities.push_back(community);
+        communityIndex++;
     }
     inFile.close();
     return 0;
 }
 
-int PickRandomSeeds(std::vector <std::set<unsigned int> >& communities,
-                    std::vector <std::set<unsigned int> >& seeds,
-                    double proportion) {
+int PickRandomSeedsInGroundTruth(std::vector< NodeSet >& communities, std::vector< NodeSet >& seeds, double proportion) {
     std::srand(std::time(0));
-    for (std::vector<std::set<unsigned int> >::iterator it1 = communities.begin();
-         it1 != communities.end();
-         ++it1) {
-        std::vector<unsigned int> community((*it1).begin(), (*it1).end());
+    for (std::vector< NodeSet >::iterator it1 = communities.begin(); it1 != communities.end(); ++it1) {
+        std::vector< uint32_t > community((*it1).begin(), (*it1).end());
         std::random_shuffle(community.begin(), community.end());
-        std::set<unsigned int> seedSet;
-        unsigned int seedSetSize = ceil(((double) (*it1).size()) * proportion);
-        std::vector<unsigned int>::iterator it2 = community.begin();
-        unsigned int i = 0;
+        NodeSet seedSet;
+        uint32_t seedSetSize = ceil(((double) (*it1).size()) * proportion);
+        std::vector< uint32_t >::iterator it2 = community.begin();
+        uint32_t i = 0;
         while(it2 != community.end() && i < seedSetSize) {
             seedSet.insert((*it2));
             ++it2;
@@ -118,32 +105,88 @@ int PickRandomSeeds(std::vector <std::set<unsigned int> >& communities,
     return 0;
 }
 
-int BuildCommunities(unsigned int * nodeCommunity,
-                     std::map<unsigned int, std::set<unsigned int> >& communities,
-                     unsigned int maxNodeId) {
-    for (unsigned int i = 0; i <= maxNodeId; i++) {
+int PickRandomSeedsNearGroundTruth(std::vector< NodeSet >& nodeNeighbors, std::vector< NodeSet >& communities, std::vector< NodeSet >& seeds,
+                                   double proportion, uint32_t distanceToGroundTruth) {
+    std::srand(std::time(0));
+    for (std::vector< NodeSet >::iterator it1 = communities.begin(); it1 != communities.end(); ++it1) {
+        std::vector< uint32_t > community((*it1).begin(), (*it1).end());
+        NodeSet seedSet;
+        uint32_t seedSetSize = ceil(((double) (*it1).size()) * proportion);
+        // We compute the neighborhood
+        NodeSet neighborhood;
+        for (std::vector< uint32_t >::iterator it2 = community.begin(); it2 != community.end(); ++it2) {
+                neighborhood.insert(*it2);
+        }
+        for (uint32_t t = 0; t < distanceToGroundTruth; t++) {
+            NodeSet nextNeighborhood(neighborhood);
+            for (NodeSet::iterator it2 = neighborhood.begin();
+                 it2 != neighborhood.end(); ++it2) {
+                uint32_t node1 = *it2;
+                NodeSet neighbors = nodeNeighbors[node1];
+                for (NodeSet::iterator it3 = neighbors.begin();
+                     it3 != neighbors.end(); ++it3) {
+                    uint32_t node2 = *it3;
+                    nextNeighborhood.insert(node2);
+                }
+            }
+            neighborhood = nextNeighborhood;
+        }
+        // We choose random seeds in the neighborhood
+        std::vector<  uint32_t > candidates (neighborhood.begin(), neighborhood.end());
+        std::random_shuffle(candidates.begin(), candidates.end());
+        std::vector< uint32_t >::iterator it2 = candidates.begin();
+        uint32_t i = 0;
+        while(it2 != candidates.end() && i < seedSetSize) {
+            seedSet.insert((*it2));
+            ++it2;
+            ++i;
+        }
+        seeds.push_back(seedSet);
+    }
+    return 0;
+}
+
+int PickRandomSeeds(uint32_t maxNodeId, std::vector< NodeSet >& nodeNeighbors, std::vector< NodeSet >& seeds,
+                    uint32_t numSeeds, uint32_t numSimulations) {
+    std::srand(std::time(0));
+    for (uint32_t i = 0; i < numSimulations; i++) {
+        NodeSet seedSet;
+        for (uint32_t j = 0; j < numSeeds; j++) {
+            uint32_t selectedNode = 0;
+            while (true) {
+                selectedNode = std::rand() % (int)(maxNodeId + 1);
+                if (nodeNeighbors[selectedNode].size() > 0) {
+                    break;
+                }
+            }
+            seedSet.insert(selectedNode);
+        }
+        seeds.push_back(seedSet);
+    }
+    return 0;
+}
+
+int BuildCommunities(uint32_t * nodeCommunity, std::map< uint32_t, NodeSet >& communities, uint32_t maxNodeId) {
+    for (uint32_t i = 0; i <= maxNodeId; i++) {
         communities[nodeCommunity[i]].insert(i);
     }
     return 0;
 }
 
-double GetAverage(std::vector<double>& vector) {
+double GetAverage(std::vector< double >& vector) {
     double sum = 0.0;
-    for (std::vector<double>::iterator it = vector.begin(); it != vector.end(); ++it) {
+    for (std::vector< double >::iterator it = vector.begin(); it != vector.end(); ++it) {
         sum += *it;
     }
     return sum / ((double) vector.size());
 }
 
-int PrintPartition(const char* fileName,
-                   std::vector<std::set<unsigned int> >& communities) {
+int PrintPartition(const char* fileName, std::vector< NodeSet >& communities) {
     std::ofstream outFile;
     outFile.open(fileName);
-    for (std::vector<std::set<unsigned int> >::iterator it1 = communities.begin();
-         it1 != communities.end();
-         ++it1) {
-        std::set<unsigned int>::iterator it2 = (*it1).begin();
-        unsigned int nodeId;
+    for (std::vector< NodeSet >::iterator it1 = communities.begin(); it1 != communities.end(); ++it1) {
+        NodeSet::iterator it2 = (*it1).begin();
+        uint32_t nodeId;
         while ( true ) {
             nodeId = *it2;
             ++it2;
@@ -159,11 +202,10 @@ int PrintPartition(const char* fileName,
     return 0;
 }
 
-int PrintVector(const char* fileName,
-                std::vector<double>& vector) {
+int PrintVector(const char* fileName, std::vector< double >& vector) {
     std::ofstream outFile;
     outFile.open(fileName);
-    for (std::vector<double>::iterator it = vector.begin();
+    for (std::vector< double >::iterator it = vector.begin();
          it != vector.end(); ++it) {
         outFile << *it << std::endl;
     }
@@ -171,49 +213,15 @@ int PrintVector(const char* fileName,
     return 0;
 }
 
-unsigned int ComputeIntersectionSize(std::set<unsigned int> community1, std::set<unsigned int> community2) {
-    unsigned int intersection = 0;
-    if( community1.size() < community2.size() ) {
-        for( std::set<unsigned int>::iterator iterCom1 = community1.begin(); iterCom1 != community1.end(); iterCom1++ ) {
-            if( community2.find( *iterCom1 ) != community2.end() ) {
-                intersection++;
-            }
-        }
-    } else {
-        for( std::set<unsigned int>::iterator iterCom2 = community2.begin(); iterCom2 != community2.end(); iterCom2++ ) {
-            if( community1.find( *iterCom2 ) != community1.end() ) {
-                intersection++;
-            }
-        }
+void PrintSet(NodeSet set) {
+    for (NodeSet::iterator it = set.begin(); it != set.end(); ++it) {
+        printf("%i ", *it);
     }
-    return intersection;
+    printf("\n");
 }
 
-double ComputeF1Score(std::set<unsigned int> community1, std::set<unsigned int> community2) {
-    unsigned sizeIntersection = ComputeIntersectionSize(community1, community2);
-    double sizecommunity1 = community1.size();
-    double sizecommunity2 = community2.size();
-    double f1Score = 0.0;
-    if (sizeIntersection > 0 && sizecommunity1 > 0 && sizecommunity2 > 0) {
-        double a = sizeIntersection / sizecommunity1;
-        double b = sizeIntersection / sizecommunity2;
-        f1Score = 2.0 * a * b / (a + b);
+void PrintPageRank(std::vector< double > pageRank, NodeSet support) {
+    for (NodeSet::iterator it = support.begin(); it != support.end(); ++it) {
+        printf("Node %i -> %f\n", *it, pageRank[*it]);
     }
-    return f1Score;
-}
-
-double ComputeF1Score(unsigned int sizeCommunity1, unsigned int sizeCommunity2, unsigned int sizeIntersection) {
-    double f1Score = 0.0;
-    if (sizeIntersection > 0 && sizeCommunity1 > 0 && sizeCommunity2 > 0) {
-        double a = ((double) sizeIntersection) / ((double) sizeCommunity1);
-        double b = ((double) sizeIntersection) / ((double) sizeCommunity2);
-        f1Score = 2.0 * a * b / (a + b);
-    }
-    return f1Score;
-}
-
-double ComputeConductance(unsigned int degreeSum, unsigned int internalEdges) {
-    double cut = (degreeSum / 2) - internalEdges;
-    double conductance = cut / (((double) degreeSum) + cut);
-    return conductance;
 }

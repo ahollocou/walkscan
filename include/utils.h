@@ -1,9 +1,11 @@
-#ifndef DYCOLA_UTILS_H
-#define DYCOLA_UTILS_H
+#ifndef WALKSCAN_UTILS_H
+#define WALKSCAN_UTILS_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
 #include <map>
+#include <list>
 #include <vector>
 #include <set>
 #include <utility>
@@ -13,32 +15,64 @@
 #include <cmath>
 #include <algorithm>
 #include <ctime>
+#include <cstdlib>
+#include <string.h>
+#include "../include/types.h"
+
+#define CHECK_ARGUMENT_STRING(index, option,variable,setVariable) \
+    if( strcmp(argv[index],option) == 0 ){ \
+            setVariable = true; \
+            if( (index+1) < argc ) { \
+                variable = argv[index+1]; \
+            } else { \
+                printf( "Invalid options.\n" ); \
+                return 1;\
+            }\
+        }
+
+#define CHECK_ARGUMENT_FLOAT(index, option,variable,setVariable) \
+    if( strcmp(argv[index],option) == 0 ){ \
+            setVariable = true; \
+            if( (index+1) < argc ) { \
+                variable = atof(argv[index+1]); \
+            } else { \
+                printf( "Invalid options.\n" ); \
+                return 1;\
+            }\
+        }
+
+#define CHECK_ARGUMENT_INT(index, option,variable,setVariable) \
+    if( strcmp(argv[index],option) == 0 ){ \
+            setVariable = true; \
+            if( (index+1) < argc ) { \
+                variable = atoi(argv[index+1]); \
+            } else { \
+                printf( "Invalid options.\n" ); \
+                return 1;\
+            }\
+        }
+
+#define CHECK_FLAG(index, option,setVariable) \
+    if( strcmp(argv[index],option) == 0 ){ \
+            setVariable = true; \
+        }
 
 long unsigned StartClock();
 long unsigned StopClock(long unsigned initTime);
-void DisplayProgress(double progress, unsigned int barWidth);
-void PrintPageRank(std::vector <double> pageRank, std::set<unsigned int> support);
-int LoadGraph(char * graphFileName,
-              std::vector <std::pair<unsigned int, unsigned int> >& edgeList,
-              unsigned int& maxNodeId);
-int BuildNeighborhoods(std::vector <std::pair<unsigned int, unsigned int> >& edgeList,
-                       std::vector<std::set<unsigned int> >& nodeNeighbors);
-int LoadCommunity(char * communityFileName,
-                  std::vector <std::set<unsigned int> >& communities);
-int PickRandomSeeds(std::vector <std::set<unsigned int> >& communities,
-                    std::vector <std::set<unsigned int> >& seeds,
-                    double proportion);
-int BuildCommunities(unsigned int * nodeCommunity,
-                     std::map<unsigned int, std::set<unsigned int> >& communities,
-                     unsigned int maxNodeId);
-double GetAverage(std::vector<double>& vector);
-int PrintPartition(const char* fileName,
-                   std::vector<std::set<unsigned int> >& communities);
-int PrintVector(const char* fileName,
-                std::vector<double>& vector);
-unsigned int ComputeIntersectionSize(std::set<unsigned int> community1, std::set<unsigned int> community2);
-double ComputeF1Score(std::set<unsigned int> community1, std::set<unsigned int> community2);
-double ComputeF1Score(unsigned int sizeCommunity1, unsigned int sizeCommunity2, unsigned int sizeIntersection);
-double ComputeConductance(unsigned int degreeSum, unsigned int internalEdges);
+void DisplayProgress(double progress, uint32_t barWidth);
+int LoadGraph(char * graphFileName, std::vector< Edge >& edgeList, uint32_t& maxNodeId);
+int BuildNeighborhoods(std::vector< Edge >& edgeList, std::vector< NodeSet >& nodeNeighbors);
+int LoadCommunity(char * communityFileName, std::vector< NodeSet >& communities, std::vector< NodeSet >& nodeCommunities);
+int PickRandomSeedsInGroundTruth(std::vector< NodeSet >& communities, std::vector< NodeSet >& seeds, double proportion);
+int PickRandomSeedsNearGroundTruth(std::vector< NodeSet >& nodeNeighbors, std::vector< NodeSet >& communities, std::vector< NodeSet >& seeds,
+                                   double proportion, uint32_t distanceToGroundTruth);
+int PickRandomSeeds(uint32_t maxNodeId, std::vector< NodeSet >& nodeNeighbors, std::vector< NodeSet >& seeds,
+                    uint32_t numSeeds, uint32_t numSimulations);
+int BuildCommunities(uint32_t * nodeCommunity, std::map< uint32_t, NodeSet >& communities, uint32_t maxNodeId);
+double GetAverage(std::vector< double >& vector);
+int PrintPartition(const char* fileName, std::vector< NodeSet >& communities);
+int PrintVector(const char* fileName, std::vector< double >& vector);
+void PrintSet(NodeSet set);
+void PrintPageRank(std::vector< double > pageRank, NodeSet support);
 
 #endif
