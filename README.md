@@ -3,7 +3,7 @@
 This repository provides a reference implementation of the local community detection algorithms
 described in the following research paper submitted to an upcomming conference:
 
-**Improving PageRank for Local Community Detection**, Alexandre Hollocou, Marc Lelarge, Thomas Bonald
+**Improving PageRank for Local Community Detection**, Alexandre Hollocou, Thomas Bonald, Marc Lelarge
 
 ArXiv link: https://arxiv.org/abs/1610.08722
 
