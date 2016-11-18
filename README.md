@@ -13,10 +13,8 @@ A C++ implementation of WalkSCAN, PageRank and LexRank is available in the **c_c
 
 ### Compilation
 
-Be sure to have downloaded the DBSCAN submodule:
-    git submodule update --init --recursive
-
 Execute the following commands in the **c_code** directory:
+
     mkdir build
     cd build
     cmake ..
@@ -30,7 +28,6 @@ Note: For MacOS X, install GCC with Homebrew and use:
 
 To detect communities from given seed sets, use the **walkscan** command:
 
-    Graph filename not set
     Usage: walkscan <flags>
     Availaible flags:
         -i [graph file name] : Specifies the graph file (tab-separated list of edges).
@@ -44,17 +41,16 @@ To detect communities from given seed sets, use the **walkscan** command:
 
 ### Usage for benchmarks
 
-To perform benchmarks with ground-truth information, use the *benchmarks* command:
+To perform benchmarks with ground-truth information, use the **benchmarks** command:
 
-Graph filename not set
-Usage: benchmarks <flags>
-Availaible flags:
-    -i [graph file name] : Specifies the graph file (tab-separated list of edges).
-    -c [community file name] : Specifies the file with the ground-truth communities (tab-separated list of nodes).
-    -b [benchmark type] :
-        0 -> Classic benchmark: we pick a seed set in each ground-truth community.
-        1 -> Random seed set: we pick k random seed nodes in the graph (and we make x simulations).
-        2 -> Locally random seed set: we pick one seed set in the neighborhood of each ground-truth community.
+    Usage: benchmarks <flags>
+    Availaible flags:
+        -i [graph file name] : Specifies the graph file (tab-separated list of edges).
+        -c [community file name] : Specifies the file with the ground-truth communities (tab-separated list of nodes).
+        -b [benchmark type] :
+            0 -> Classic benchmark: we pick a seed set in each ground-truth community.
+            1 -> Random seed set: we pick k random seed nodes in the graph (and we make x simulations).
+            2 -> Locally random seed set: we pick one seed set in the neighborhood of each ground-truth community.
 
 #### Classic benchmark
 
