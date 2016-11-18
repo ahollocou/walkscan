@@ -7,7 +7,11 @@ described in the following research paper submitted to an upcomming conference:
 
 ArXiv link: https://arxiv.org/abs/1610.08722
 
-## Compilation
+## C++
+
+A C++ implementation of WalkSCAN, PageRank and LexRank is available in the **c_code** directory.
+
+### Compilation
 
 Be sure to have downloaded the DBSCAN submodule:
 ```shell
@@ -25,7 +29,7 @@ Note: For MacOS X, install GCC with Homebrew and use:
 cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
 ```
 
-## Usage
+### Usage
 
     Graph filenameme not set
     Usage: walkscan <flags>
@@ -37,7 +41,7 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
             1 -> Random seed set: we pick k random seed nodes in the graph (and we make x simulations).
             2 -> Locally random seed set: we pick one seed set in the neighborhood of each ground-truth community.
 
-### Classic benchmark
+- Classic benchmark
 
     Usage: walkscan <flags> - CLASSIC BENCHMARK
     Benchmark flags:
@@ -53,7 +57,7 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
             1: Rank Threshold
             2: Conductance
 
-### Random seed set benchmark
+- Random seed set benchmark
 
     Usage: walkscan <flags> - RANDOM SEED SET
     Benchmark flags:
@@ -66,7 +70,7 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
             0: PageRank (with conductance as objective function)
             2: WalkScan (use flags --epsilon and --min-elems to change parameter values)
 
-### Locally random seed set benchmark
+- Locally random seed set benchmark
 
     Usage: walkscan <flags> - LOCALLY RANDOM SEED SET
     Benchmark flags:
@@ -82,6 +86,10 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
             0: Max-F1
             1: Rank Threshold
             2: Conductance
+
+## Python
+
+An implementation of WalkSCAN in Python is available in the **python_code** directory.
 
 ## Citing
 
