@@ -27,5 +27,9 @@ int LexRankMinConductance(std::vector< NodeSet >& nodeNeighbors,
                           std::vector< NodeSet >& seedSets,
                           std::vector< NodeSet >& communities,
                           std::vector< double >& f1Scores);
+int LexRankMinConductanceNoF1(std::vector< NodeSet >& nodeNeighbors,
+                              std::vector< std::vector< NodeLexRank > >& lexRankResult,
+                              std::vector< NodeSet >& seedSets,
+                              std::vector< NodeSet >& communities);
 
 #endif

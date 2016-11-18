@@ -1,7 +1,7 @@
 #include "../include/benchmark_locally_random_seeds.h"
 
 static void PrintBenchmarkLocallyRandomSeedsUsage() {
-    printf("Usage: walkscan <flags> - LOCALLY RANDOM SEED SET\n");
+    printf("Usage: benchmarks <flags> - LOCALLY RANDOM SEED SET\n");
     printf("Benchmark flags:\n");
     printf("\t-o [output path/prefix] : Specifies the prefix for output files.\n");
     printf("\t-s [seed file name] : Specifies a file with the seed sets (if not specified, seeds are chosen at random in the neighborhood of ground-truth communities).\n");

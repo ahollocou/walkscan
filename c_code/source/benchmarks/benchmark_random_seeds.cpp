@@ -1,7 +1,7 @@
 #include "../include/benchmark_random_seeds.h"
 
 static void PrintBenchmarkRandomSeedsUsage() {
-    printf("Usage: walkscan <flags> - RANDOM SEED SET\n");
+    printf("Usage: benchmarks <flags> - RANDOM SEED SET\n");
     printf("Benchmark flags:\n");
     printf("\t-o [output path/prefix] : Specifies the prefix for output files.\n");
     printf("\t-s [seed file name] : Specifies a file with the seed sets (if not specified, k random seeds will be picked for each simulation).\n");

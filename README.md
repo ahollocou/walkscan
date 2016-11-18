@@ -14,36 +14,51 @@ A C++ implementation of WalkSCAN, PageRank and LexRank is available in the **c_c
 ### Compilation
 
 Be sure to have downloaded the DBSCAN submodule:
-```shell
-git submodule update --init --recursive
-```
+    git submodule update --init --recursive
 
-```shell
-cmake .
-make
-```
+Execute the following commands in the **c_code** directory:
+    mkdir build
+    cd build
+    cmake ..
+    make
 
 Note: For MacOS X, install GCC with Homebrew and use:
 
-```shell
-cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
-```
+    cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 ..
 
-### Usage
+### Usage for local community detection
 
-    Graph filenameme not set
+To detect communities from given seed sets, use the **walkscan** command:
+
+    Graph filename not set
     Usage: walkscan <flags>
     Availaible flags:
         -i [graph file name] : Specifies the graph file (tab-separated list of edges).
-        -c [community file name] : Specifies the file with the ground-truth communities (tab-separated list of nodes).
-        -b [benchmark type] :
-            0 -> Classic benchmark: we pick a seed set in each ground-truth community.
-            1 -> Random seed set: we pick k random seed nodes in the graph (and we make x simulations).
-            2 -> Locally random seed set: we pick one seed set in the neighborhood of each ground-truth community.
+        -o [output path/prefix] : Specifies the prefix for output files.
+        -s [seed file name] : Specifies a file with the seed sets.
+        -t [walk length] : Specifies the length of the random walks (default value: 2).
+        -a [algorithm] : Specifies the algorithm (default value: 0).
+            0: PageRank with conductance
+            1: LexRank with conductance
+            2: WalkScan (use flags --epsilon and --min-elems to change parameter values)
+
+### Usage for benchmarks
+
+To perform benchmarks with ground-truth information, use the *benchmarks* command:
+
+Graph filename not set
+Usage: benchmarks <flags>
+Availaible flags:
+    -i [graph file name] : Specifies the graph file (tab-separated list of edges).
+    -c [community file name] : Specifies the file with the ground-truth communities (tab-separated list of nodes).
+    -b [benchmark type] :
+        0 -> Classic benchmark: we pick a seed set in each ground-truth community.
+        1 -> Random seed set: we pick k random seed nodes in the graph (and we make x simulations).
+        2 -> Locally random seed set: we pick one seed set in the neighborhood of each ground-truth community.
 
 #### Classic benchmark
 
-    Usage: walkscan <flags> - CLASSIC BENCHMARK
+    Usage: benchmarks <flags> - CLASSIC BENCHMARK
     Benchmark flags:
         -o [output path/prefix] : Specifies the prefix for output files.
         -s [seed file name] : Specifies a file with the seed sets (if not specified, seed nodes are chosen at random in each ground-truth community).
@@ -59,7 +74,7 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
 
 #### Random seed set benchmark
 
-    Usage: walkscan <flags> - RANDOM SEED SET
+    Usage: benchmarks <flags> - RANDOM SEED SET
     Benchmark flags:
         -o [output path/prefix] : Specifies the prefix for output files.
         -s [seed file name] : Specifies a file with the seed sets (if not specified, k random seeds will be picked for each simulation).
@@ -72,7 +87,7 @@ cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 .
 
 #### Locally random seed set benchmark
 
-    Usage: walkscan <flags> - LOCALLY RANDOM SEED SET
+    Usage: benchmarks <flags> - LOCALLY RANDOM SEED SET
     Benchmark flags:
         -o [output path/prefix] : Specifies the prefix for output files.
         -s [seed file name] : Specifies a file with the seed sets (if not specified, seeds are chosen at random in the neighborhood of ground-truth communities).

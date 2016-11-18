@@ -102,6 +102,48 @@ int LexRankMaxF1(std::vector< std::vector< NodeLexRank > >& lexRankResult,
     return 0;
 }
 
+int LexRankMinConductanceNoF1(std::vector< NodeSet >& nodeNeighbors,
+                              std::vector< std::vector< NodeLexRank > >& lexRankResult,
+                              std::vector< NodeSet >& seedSets,
+                              std::vector< NodeSet >& communities) {
+    uint32_t nbCommunities = seedSets.size();
+    for (uint32_t i = 0; i < nbCommunities; i++) {
+        DisplayProgress(((double) i) / (double) nbCommunities, 100);
+        std::vector< NodeLexRank > nodeLexRank(lexRankResult[i]);
+        NodeSet community(seedSets[i]);
+        uint32_t communitySize = community.size();
+        NodeSet bestCommunity(community);
+        uint32_t internalEdges = 0;
+        uint32_t degreeSum = 0;
+        for (NodeSet::iterator it = community.begin(); it != community.end(); ++it) {
+            uint32_t node = *it;
+            NodeSet neighborhood = nodeNeighbors[node];
+            internalEdges += ComputeIntersectionSize(neighborhood, community);
+            degreeSum += neighborhood.size();
+        }
+        double bestConductance = ComputeConductance(degreeSum, internalEdges);
+
+        for (std::vector< NodeLexRank >::iterator it = nodeLexRank.begin();
+             it != nodeLexRank.end(); ++it) {
+            uint32_t node = (*it).first;
+            community.insert(node);
+            communitySize++;
+            NodeSet neighborhood = nodeNeighbors[node];
+            internalEdges += ComputeIntersectionSize(neighborhood, community);
+            degreeSum += neighborhood.size();
+            double conductance = ComputeConductance(degreeSum, internalEdges);
+            if (conductance <= bestConductance) {
+                bestCommunity = community;
+                bestConductance = conductance;
+            }
+        }
+        communities[i] = bestCommunity;
+    }
+    std::cout << std::endl;
+    return 0;
+}
+
+
 int LexRankMinConductance(std::vector< NodeSet >& nodeNeighbors,
                           std::vector< std::vector< NodeLexRank > >& lexRankResult,
                           std::vector< NodeSet >& groundTruthCommunities,
@@ -150,4 +192,3 @@ int LexRankMinConductance(std::vector< NodeSet >& nodeNeighbors,
     std::cout << std::endl;
     return 0;
 }
-

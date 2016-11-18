@@ -4,7 +4,7 @@
 #include "../include/benchmark_locally_random_seeds.h"
 
 static void PrintUsage() {
-    printf("Usage: walkscan <flags>\n");
+    printf("Usage: benchmarks <flags>\n");
     printf("Availaible flags:\n");
     printf("\t-i [graph file name] : Specifies the graph file (tab-separated list of edges).\n");
     printf("\t-c [community file name] : Specifies the file with the ground-truth communities (tab-separated list of nodes).\n");

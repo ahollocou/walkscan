@@ -1,7 +1,7 @@
 #include "../include/benchmark.h"
 
 static void PrintBenchmarkUsage() {
-    printf("Usage: walkscan <flags> - CLASSIC BENCHMARK\n");
+    printf("Usage: benchmarks <flags> - CLASSIC BENCHMARK\n");
     printf("Benchmark flags:\n");
     printf("\t-o [output path/prefix] : Specifies the prefix for output files.\n");
     printf("\t-s [seed file name] : Specifies a file with the seed sets (if not specified, seed nodes are chosen at random in each ground-truth community).\n");
@@ -59,10 +59,10 @@ int RunBenchmark(int argc, char ** argv,
                 printf("Selected algorithm: PageRank\n");
                 break;
             case 1:
-                printf("Selected algorithm: PageRank\n");
+                printf("Selected algorithm: LexRank\n");
                 break;
             case 2:
-                printf("Selected algorithm: PageRank\n");
+                printf("Selected algorithm: WalkSCAN\n");
                 break;
             default:
                 printf("Invalid algorithm\n");

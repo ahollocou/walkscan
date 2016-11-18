@@ -40,5 +40,15 @@ int WalkScanF1SeedUnion(std::vector <std::vector< NodeSet > > & walkScanResult,
                         std::vector< NodeSet >& seeds,
                         std::vector< double >& f1Scores,
                         uint32_t expertLimit);
+int WalkScanNoGroundTruth(std::vector< NodeSet >& nodeNeighbors,
+                          std::vector< NodeSet >& seeds,
+                          uint32_t nbSteps,
+                          std::vector< std::vector< NodeSet > > & walkScanResult,
+                          uint32_t maxNodeId,
+                          double epsilon,
+                          uint32_t minElems);
+int WalkScanFirstCommunity(std::vector< std::vector< NodeSet > > & walkScanResult,
+                           std::vector< NodeSet >& seeds,
+                           std::vector< NodeSet >& communities);
 
 #endif

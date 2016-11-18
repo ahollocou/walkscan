@@ -1,3 +1,0 @@
-[submodule "dbscan"]
-	path = dbscan
-	url = https://github.com/propanoid/DBSCAN.git
