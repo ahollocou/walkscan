@@ -1,4 +1,5 @@
-# walkscan
+walkscan
+---
 
 This repository provides a reference implementation of the local community detection algorithms
 described in the following research paper submitted to an upcomming conference:
@@ -7,11 +8,11 @@ described in the following research paper submitted to an upcomming conference:
 
 ArXiv link: https://arxiv.org/abs/1610.08722
 
-## C++
+# C++
 
 A C++ implementation of WalkSCAN, PageRank and LexRank is available in the **c_code** directory.
 
-### Compilation
+## Compilation
 
 Execute the following commands in the **c_code** directory:
 
@@ -24,7 +25,7 @@ Note: For MacOS X, install GCC with Homebrew and use:
 
     cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/6.2.0/bin/g++-6 ..
 
-### Usage for local community detection
+## Usage for local community detection
 
 To detect communities from given seed sets, use the **walkscan** command:
 
@@ -39,7 +40,7 @@ To detect communities from given seed sets, use the **walkscan** command:
             1: LexRank with conductance
             2: WalkScan (use flags --epsilon and --min-elems to change parameter values)
 
-### Usage for benchmarks
+## Usage for benchmarks
 
 To perform benchmarks with ground-truth information, use the **benchmarks** command:
 
@@ -98,14 +99,64 @@ To perform benchmarks with ground-truth information, use the **benchmarks** comm
             1: Rank Threshold
             2: Conductance
 
-## Python
+# Python
 
 An implementation of WalkSCAN in Python is available in the **python_code** directory.
 
-## Citing
+## Dependencies
+WalkSCAN requires the following packages:
+[NetworkX](https://pypi.python.org/pypi/networkx/)
+, [NumPy](https://pypi.python.org/pypi/numpy/)
+and [Scikit Learn](https://pypi.python.org/pypi/scikit-learn/).
+
+
+
+## Example
+
+```{python}
+from walkscan import WalkSCAN
+import networkx as nx
+
+# Create a random graph with two partitions
+G = nx.random_partition_graph([10, 15], 0.9, 0.01)
+
+# Create a WalkSCAN instance
+ws = WalkSCAN(nb_steps=3, eps=0.05, min_samples=2)
+
+# Initialization vector for the random walk
+init_vector = {0: 0.5, 1: 0.5}
+
+# Compute the communities
+ws.detect_communities(G, init_vector)
+
+# Print the best community
+print ws.communities_[0]
+```
+
+# Usage
+
+The class constructor of `WalkSCAN` takes three parameters:
+
+- the length of the random walk: `nb_steps`
+- the two parameters for DBSCAN `eps` and `min_samples`
+
+In order to run the community detection algorithm, use the `detect_communities` method with parameters:
+
+- `graph`: NetworkX graph (can be weighted)
+- `init_vector`: dictionary `node_id -> initial_probability` to initialize the random walk
+
+The results of the algorithm are stored in the attributes:
+
+- `communities_`: list of communities, ordered by decreasing closeness to the seed set
+- `embedded_nodes_`: list of the embedded nodes
+- `embedded_values_`: dictionary `node_id -> embedding_value` containing the result of the embedding
+- `cores_`: dictionary containing the cores computed via DBSCAN
+- `outliers_`: list of the outliers computed by DBSCAN
+
+# Citing
 
 If you find WalkSCAN interesting for your research, please consider citing our paper.
 
-## Contact
+# Contact
 
 Please send any questions you might have about the paper or the code to <alexandre.hollocou@inria.fr>.
